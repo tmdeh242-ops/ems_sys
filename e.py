@@ -162,7 +162,7 @@ elif choice == "관리자 페이지":
                 st.session_state.admin_auth = True
                 st.rerun()
             else:
-                st.error("비밀번호 오류")
+                st.error("❌ 비밀번호 오류")
 
         st.stop()
 
@@ -213,12 +213,12 @@ elif choice == "관리자 페이지":
                         거래상태 = match.iloc[0]["거래여부"]
     
                         if 거래상태 == "거래완료":
-                            cols[2].error("거래완료 매물")
+                            cols[2].error("❌ 예약이 불가능한 세대입니다.(거래완료)")
                             오류여부 = True
                         else:
                             cols[2].success(f"타입: {타입}")
                     else:
-                        cols[2].error("매물 없음")
+                        cols[2].error("❌ 예약 불가(매물 없음)")
                         오류여부 = True
     
                 세대목록.append({"동":동,"호수":호수,"타입":타입})
@@ -237,7 +237,7 @@ elif choice == "관리자 페이지":
             if submit:
     
                 if 오류여부:
-                    st.error("예약 불가한 세대가 포함되어 있습니다.")
+                    st.error("❌ 예약 불가한 세대가 포함되어 있습니다.")
                 else:
     
                     target_ws = ws_day if int(예약시간[:2]) < 16 else ws_night
@@ -302,7 +302,7 @@ elif choice == "관리자 페이지":
                 </div>
                 """, unsafe_allow_html=True)
         else:
-            st.info("예약 데이터 없음")
+            st.info("❌ 예약 데이터 없음")
     # =========================
     # ⚙ 기존 관리자 기능
     # =========================
@@ -361,4 +361,4 @@ elif choice == "관리자 페이지":
                     st.rerun()
     
             else:
-                st.error("해당 매물 없음")
+                st.error("❌ 해당 매물 없음")
