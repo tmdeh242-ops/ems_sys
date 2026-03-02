@@ -141,65 +141,48 @@ st.markdown("""
 
 /* ===== 사이드바 배경 ===== */
 section[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+    background: linear-gradient(180deg, #111827 0%, #1f2937 100%);
 }
 
-/* 사이드바 타이틀 숨기기 (깔끔하게) */
-section[data-testid="stSidebar"] label {
-    display: none;
-}
-
-/* ===== 라디오 그룹 간격 ===== */
+/* 라디오 그룹 여백 */
 section[data-testid="stSidebar"] div[role="radiogroup"] {
     margin-top: 20px;
-    gap: 10px;
 }
 
-/* ===== 기본 메뉴 버튼 ===== */
+/* 기본 메뉴 버튼 */
 section[data-testid="stSidebar"] div[role="radiogroup"] label {
     background: rgba(255,255,255,0.05);
-    padding: 14px 16px;
-    border-radius: 14px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    margin-bottom: 8px;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: 0.2s ease;
     border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* 글씨색 */
+section[data-testid="stSidebar"] div[role="radiogroup"] label div {
+    color: #e5e7eb !important;
     font-weight: 500;
 }
 
-/* 글씨 */
-section[data-testid="stSidebar"] div[role="radiogroup"] label div {
-    color: #cbd5e1 !important;
-    font-size: 15px;
-}
-
-/* ===== 마우스 호버 ===== */
+/* 마우스 오버 */
 section[data-testid="stSidebar"] div[role="radiogroup"] label:hover {
-    background: rgba(255,215,0,0.15);
-    transform: translateX(6px);
-    border: 1px solid rgba(255,215,0,0.4);
+    background: rgba(16,185,129,0.2);
+    border: 1px solid rgba(16,185,129,0.5);
+    transform: translateX(4px);
 }
 
-/* ===== 선택된 메뉴 ===== */
-section[data-testid="stSidebar"] input[type="radio"]:checked + div {
-    background: linear-gradient(90deg, #bfa14a, #f5d76e);
-    color: #0f172a !important;
+/* 선택된 메뉴 (안전 방식) */
+section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
+    background: linear-gradient(90deg, #10b981, #059669);
+    border: 1px solid #10b981;
+}
+
+/* 선택된 메뉴 글씨 */
+section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) div {
+    color: white !important;
     font-weight: 700;
-    border-radius: 14px;
-    padding: 14px 16px;
-}
-
-/* 선택된 항목 글씨 */
-section[data-testid="stSidebar"] input[type="radio"]:checked + div div {
-    color: #0f172a !important;
-}
-
-/* ===== 모바일 대응 ===== */
-@media (max-width: 768px) {
-
-    section[data-testid="stSidebar"] div[role="radiogroup"] label {
-        padding: 12px;
-    }
-
 }
 
 </style>
