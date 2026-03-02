@@ -104,7 +104,7 @@ section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked)
 div.stButton > button {
     width: 100%;
     background: linear-gradient(90deg, #004c7a, #0077b6);
-    color: white;
+    color: black;
     border-radius: 12px;
     height: 3em;
     font-weight: 600;
