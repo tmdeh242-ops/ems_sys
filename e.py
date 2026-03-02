@@ -248,11 +248,23 @@ elif choice == "관리자 관리페이지":
 
     if not st.session_state.admin_auth:
         pwd = st.text_input("관리자 비밀번호", type="password")
-        if pwd == "ems0952":
+        if pwd == "0952":
             st.session_state.admin_auth = True
             st.rerun()
         else:
             st.stop()
+         
+   st.subheader("📊 실시간 통계")
+
+         전체 = len(df_total)
+         관람가능 = len(df_total[df_total["거래여부"]=="관람가능"])
+         거래완료 = len(df_total[df_total["거래여부"]=="거래완료"])
+
+         col1, col2, col3 = st.columns(3)
+
+         col1.metric("전체 매물", 전체)
+         col2.metric("관람 가능", 관람가능)
+         col3.metric("거래 완료", 거래완료)
 
     st.subheader("관리자 관리페이지")
 
@@ -260,6 +272,7 @@ elif choice == "관리자 관리페이지":
     동_sel = st.text_input("동 입력")
     호수_sel = st.text_input("호수 입력")
 
+         
     if 동_sel and 호수_sel:
 
         match = df_total[
