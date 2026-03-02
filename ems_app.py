@@ -212,8 +212,6 @@ def send_email_notification(content):
 menu = [
     "🏠 대시보드",
     "📋 매물조회",
-    "📅 세대관람 예약",
-    "📊 세대관람 현황",
     "⚙ 관리자 페이지"
 ]
 
@@ -246,7 +244,7 @@ df_total = load_sheet_data(sheets_to_load, columns)
 # =========================
 # 1️⃣ 통합 대시보드
 # =========================
-if choice == "통합 대시보드":
+if choice == "🏠 대시보드":
 
     단지_filter = st.multiselect("단지", df_total["단지"].unique(), default=df_total["단지"].unique())
     분양_filter = st.multiselect("분양구분", df_total["분양구분"].unique(), default=df_total["분양구분"].unique())
@@ -276,7 +274,7 @@ if choice == "통합 대시보드":
 # =========================
 # 2️⃣ 매물 조회
 # =========================
-elif choice == "매물 조회":
+elif choice == "📋 매물조회":
 
     단지 = st.selectbox("단지 선택", ["1단지","2단지","3단지"])
     거래유형 = st.selectbox("매매/임대 선택", ["매매","임대"])
@@ -290,7 +288,7 @@ elif choice == "매물 조회":
 # =========================
 # 3️⃣ 관리자 페이지
 # =========================
-elif choice == "관리자 페이지":
+elif choice == "⚙ 관리자 페이지":
 
     if not st.session_state.admin_auth:
 
