@@ -136,6 +136,53 @@ div.stError {
 </style>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<style>
+
+/* ===== 사이드바 라디오 전체 영역 ===== */
+section[data-testid="stSidebar"] div[role="radiogroup"] {
+    gap: 8px;
+}
+
+/* ===== 각 라디오 항목 ===== */
+section[data-testid="stSidebar"] div[role="radiogroup"] label {
+    background: rgba(255,255,255,0.08);
+    padding: 12px 14px;
+    border-radius: 12px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+    border: 1px solid rgba(255,255,255,0.15);
+}
+
+/* ===== 마우스 올렸을 때 ===== */
+section[data-testid="stSidebar"] div[role="radiogroup"] label:hover {
+    background: linear-gradient(90deg, #0077b6, #00b4d8);
+    transform: translateX(4px);
+}
+
+/* ===== 선택된 메뉴 ===== */
+section[data-testid="stSidebar"] input[type="radio"]:checked + div {
+    font-weight: 700;
+}
+
+section[data-testid="stSidebar"] input[type="radio"]:checked + div::before {
+    content: "✔ ";
+    color: #00e5ff;
+    font-weight: bold;
+}
+
+/* 선택된 항목 배경 */
+section[data-testid="stSidebar"] input[type="radio"]:checked ~ div {
+    background: linear-gradient(90deg, #004c7a, #0077b6);
+    color: white !important;
+    border-radius: 12px;
+    padding: 12px 14px;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
 # =========================
 # 📩 이메일 알림
 # =========================
@@ -185,7 +232,7 @@ sheets_to_load = [
     "3단지_매매","3단지_임대"
 ]
 
-columns = ["NO.","분양구분","동","호수","타입","매물구분","매매가","월세","거래여부"]
+columns = ["NO.","분양구분","동","호수","타입","매물구분","매매가(임대보증금)","월세","거래여부"]
 df_total = load_sheet_data(sheets_to_load, columns)
 
 # =========================
