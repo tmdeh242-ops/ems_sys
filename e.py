@@ -89,7 +89,7 @@ choice = st.sidebar.selectbox("메뉴 선택", menu)
 # 데이터 로드 캐싱
 # ------------------------------
 @st.cache_data(show_spinner=False)
-def load_sheet_data(sheets_to_load, columns):
+def load_sheet_data():
     df_list = []
     for s in sheets_to_load:
         ws = sheet.worksheet(s)
