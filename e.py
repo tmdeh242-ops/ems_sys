@@ -316,7 +316,7 @@ elif choice == "관리자 페이지":
   
         st.subheader("관리자 관리페이지")
     
-        단지_sel = st.selectbox("단지 선택", ["1단지","2단지","3단지"])
+        단지_sel = st.selectbox("단지 선택",["1단지","2단지","3단지"],key="admin_complex_select")
         동_sel = st.text_input("동 입력")
         호수_sel = st.text_input("호수 입력")
     
