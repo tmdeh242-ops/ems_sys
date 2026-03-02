@@ -9,11 +9,8 @@ from email.mime.text import MIMEText
 import json
 import os
 
-st.set_page_config(
-    page_title="EMS 매물관리시스템",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
+st.set_page_config(page_title="EMS 관람예약 시스템", layout="wide")
+
 # =========================
 # 🔐 관리자 세션
 # =========================
@@ -184,6 +181,9 @@ div.stError {
 
 </style>
 """, unsafe_allow_html=True)
+
+st.markdown("<h1 style='text-align:center;color:#002b45;'>🏢 EMS 매물등록관리시스템</h1>", unsafe_allow_html=True)
+
 # =========================
 # 📩 이메일 알림
 # =========================
@@ -209,13 +209,8 @@ def send_email_notification(content):
 # ------------------------------
 # 메뉴
 # ------------------------------
-menu = [
-    "🏠 대시보드",
-    "📋 매물조회",
-    "⚙ 관리자 페이지"
-]
-
-choice = st.sidebar.radio("메뉴", menu)
+menu = ["통합 대시보드", "매물 조회", "관리자 페이지"]
+choice = st.sidebar.selectbox("메뉴 선택", menu)
 
 # ------------------------------
 # 데이터 로드 캐싱
@@ -238,13 +233,13 @@ sheets_to_load = [
     "3단지_매매","3단지_임대"
 ]
 
-columns = ["NO.","분양구분","동","호수","타입","매물구분","매매가(임대보증금)","월세","거래여부"]
+columns = ["NO.","분양구분","동","호수","타입","매물구분","매매가","월세","거래여부"]
 df_total = load_sheet_data(sheets_to_load, columns)
 
 # =========================
 # 1️⃣ 통합 대시보드
 # =========================
-if choice == "🏠 대시보드":
+if choice == "통합 대시보드":
 
     단지_filter = st.multiselect("단지", df_total["단지"].unique(), default=df_total["단지"].unique())
     분양_filter = st.multiselect("분양구분", df_total["분양구분"].unique(), default=df_total["분양구분"].unique())
@@ -264,17 +259,12 @@ if choice == "🏠 대시보드":
 
     gb = GridOptionsBuilder.from_dataframe(df_filtered)
     gb.configure_pagination(paginationAutoPageSize=True)
-    AgGrid(
-        df_filtered,
-        gridOptions=gb.build(),
-        enable_enterprise_modules=False,
-        fit_columns_on_grid_load=True,
-        height=500
-        )
+    AgGrid(df_filtered, gridOptions=gb.build(), enable_enterprise_modules=False, height=500)
+
 # =========================
 # 2️⃣ 매물 조회
 # =========================
-elif choice == "📋 매물조회":
+elif choice == "매물 조회":
 
     단지 = st.selectbox("단지 선택", ["1단지","2단지","3단지"])
     거래유형 = st.selectbox("매매/임대 선택", ["매매","임대"])
@@ -288,7 +278,7 @@ elif choice == "📋 매물조회":
 # =========================
 # 3️⃣ 관리자 페이지
 # =========================
-elif choice == "⚙ 관리자 페이지":
+elif choice == "관리자 페이지":
 
     if not st.session_state.admin_auth:
 
@@ -432,25 +422,12 @@ elif choice == "⚙ 관리자 페이지":
             df_all = pd.concat(all_data, ignore_index=True)
             df_filtered = df_all[df_all["예약날짜"] == 선택날짜.strftime("%Y-%m-%d")]
             for idx,row in df_filtered.iterrows():
-                  st.markdown(f"""
-            <div class="card">
-                <div style="font-size:16px;font-weight:700;color:#003366;">
-                    {row['예약자']} ({row['관람세대수']})
+                st.markdown(f"""
+                <div style='border:1px solid #003366;padding:10px;margin:5px;border-radius:5px;background-color:#e6f2ff'>
+                <b>{row['예약자']}</b> | {row['관람세대수']} | {row['동']}동 {row['호수']}호 | {row['타입']} | {row['예약시간']}<br>
+                중개업소: {row['중개업소']} | 동행매니저: {row['동행매니저']} | 비고: {row['비고']}
                 </div>
-                <div style="margin-top:6px;">
-                    🏢 {row['동']}동 {row['호수']}호 | {row['타입']}
-                </div>
-                <div>
-                    ⏰ {row['예약시간']}
-                </div>
-                <hr style="margin:6px 0;">
-                <div style="font-size:13px;color:#555;">
-                    중개업소: {row['중개업소']}<br>
-                    동행매니저: {row['동행매니저']}<br>
-                    비고: {row['비고']}
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+                """, unsafe_allow_html=True)
         else:
             st.info("예약 데이터 없음")
     # =========================
@@ -467,9 +444,8 @@ elif choice == "⚙ 관리자 페이지":
         st.subheader("관리자 관리페이지")
     
         단지_sel = st.selectbox("단지 선택",["1단지","2단지","3단지"],key="admin_complex_select")
-        col1, col2 = st.columns(2)
-        동_sel = col1.text_input("동 입력")
-        호수_sel = col2.text_input("호수 입력")
+        동_sel = st.text_input("동 입력")
+        호수_sel = st.text_input("호수 입력")
     
         if 동_sel and 호수_sel:
     
