@@ -2,49 +2,43 @@ import streamlit as st
 import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-from datetime import date, datetime
-from st_aggrid import AgGrid, GridOptionsBuilder
-from google.oauth2.service_account import Credentials
 from datetime import date
+from st_aggrid import AgGrid, GridOptionsBuilder
 import smtplib
 from email.mime.text import MIMEText
+import json
+import os
 
 st.set_page_config(page_title="EMS 관람예약 시스템", layout="wide")
 
 # =========================
 # 🔐 관리자 세션
 # =========================
-if "admin_login" not in st.session_state:
-    st.session_state.admin_login = False
+if "admin_auth" not in st.session_state:
+    st.session_state.admin_auth = False
 
 ADMIN_PASSWORD = "3090"
 
 # ------------------------------
 # 구글 시트 인증
 # ------------------------------
-import json
-import os
-
-scope = ["https://spreadsheets.google.com/feeds",
-         "https://www.googleapis.com/auth/drive"]
+scope = [
+    "https://spreadsheets.google.com/feeds",
+    "https://www.googleapis.com/auth/drive"
+]
 
 creds_dict = json.loads(os.environ["GOOGLE_SERVICE_ACCOUNT"])
-
 creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
 client = gspread.authorize(creds)
 sheet = client.open("EMS")
+
 # =========================
-# CSS UI 업그레이드
+# CSS
 # =========================
 st.markdown("""
 <style>
-.main {
-    background-color: #f4f7fa;
-}
-.sidebar .sidebar-content {
-    background-color: #002b45;
-    color: white;
-}
+.main {background-color: #f4f7fa;}
+.sidebar .sidebar-content {background-color: #002b45;color: white;}
 div.stButton > button {
     background-color: #004c7a;
     color: white;
@@ -85,7 +79,6 @@ def send_email_notification(content):
     except:
         pass
 
-# =========================
 # ------------------------------
 # 메뉴
 # ------------------------------
@@ -107,59 +100,78 @@ def load_sheet_data(sheets_to_load, columns):
         df_list.append(df)
     return pd.concat(df_list, ignore_index=True)
 
-sheets_to_load = ["1단지_매매","1단지_임대","2단지_매매","2단지_임대","3단지_매매","3단지_임대"]
+sheets_to_load = [
+    "1단지_매매","1단지_임대",
+    "2단지_매매","2단지_임대",
+    "3단지_매매","3단지_임대"
+]
+
 columns = ["NO.","분양구분","동","호수","타입","매물구분","매매가","월세","거래여부"]
 df_total = load_sheet_data(sheets_to_load, columns)
 
-# ------------------------------
+# =========================
 # 1️⃣ 통합 대시보드
-# ------------------------------
+# =========================
 if choice == "통합 대시보드":
+
     단지_filter = st.multiselect("단지", df_total["단지"].unique(), default=df_total["단지"].unique())
     분양_filter = st.multiselect("분양구분", df_total["분양구분"].unique(), default=df_total["분양구분"].unique())
     매물_filter = st.multiselect("매물구분", df_total["매물구분"].unique(), default=df_total["매물구분"].unique())
-    거래_filter = st.multiselect("거래여부", df_total["거래여부"].unique(),
-                                  default=["관람가능"] if "관람가능" in df_total["거래여부"].unique() else df_total["거래여부"].unique())
+    거래_filter = st.multiselect(
+        "거래여부",
+        df_total["거래여부"].unique(),
+        default=["관람가능"] if "관람가능" in df_total["거래여부"].unique() else df_total["거래여부"].unique()
+    )
+
     df_filtered = df_total[
         (df_total["단지"].isin(단지_filter)) &
         (df_total["분양구분"].isin(분양_filter)) &
         (df_total["매물구분"].isin(매물_filter)) &
         (df_total["거래여부"].isin(거래_filter))
     ]
+
     gb = GridOptionsBuilder.from_dataframe(df_filtered)
     gb.configure_pagination(paginationAutoPageSize=True)
     AgGrid(df_filtered, gridOptions=gb.build(), enable_enterprise_modules=False, height=500)
 
-# ------------------------------
+# =========================
 # 2️⃣ 매물 조회
-# ------------------------------
+# =========================
 elif choice == "매물 조회":
+
     단지 = st.selectbox("단지 선택", ["1단지","2단지","3단지"])
-    분양구분 = st.selectbox("분양구분 선택", ["조합","일반"])
     거래유형 = st.selectbox("매매/임대 선택", ["매매","임대"])
+
     ws = sheet.worksheet(f"{단지}_{거래유형}")
     data = ws.get_all_values()
     df = pd.DataFrame(data[1:], columns=columns) if len(data) > 1 else pd.DataFrame(columns=columns)
-    AgGrid(df,height=400)
 
+    AgGrid(df, height=400)
+
+# =========================
+# 3️⃣ 관리자 페이지
+# =========================
 elif choice == "관리자 페이지":
 
-    if "admin_auth" not in st.session_state:
-        st.session_state.admin_auth = False
-
     if not st.session_state.admin_auth:
+
         pwd = st.text_input("관리자 비밀번호", type="password")
-        if pwd == ADMIN_PASSWORD:
-            st.session_state.admin_auth = True
-            st.rerun()
-        else:
-            st.stop()
 
-        st.success("접속 성공")
+        if pwd:
+            if pwd == ADMIN_PASSWORD:
+                st.session_state.admin_auth = True
+                st.rerun()
+            else:
+                st.error("비밀번호 오류")
 
-        tab1, tab2, tab3 = st.tabs(
-            ["📅 세대관람 예약", "📊 세대관람 현황표", "⚙ 관리자 기능"]
-        )
+        st.stop()
+
+    st.success("접속 성공")
+
+    tab1, tab2, tab3 = st.tabs(
+        ["📅 세대관람 예약", "📊 세대관람 현황표", "⚙ 관리자 기능"]
+    )
+
 
         # =========================
         # 📅 세대관람 예약 (기존 예약 코드 그대로 복붙)
