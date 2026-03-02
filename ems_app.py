@@ -185,7 +185,7 @@ AgGrid(
     enable_enterprise_modules=False,
     fit_columns_on_grid_load=True,
     height=500
-)
+    )
 # =========================
 # 2️⃣ 매물 조회
 # =========================
