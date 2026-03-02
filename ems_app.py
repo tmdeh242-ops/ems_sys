@@ -179,13 +179,13 @@ if choice == "통합 대시보드":
 
     gb = GridOptionsBuilder.from_dataframe(df_filtered)
     gb.configure_pagination(paginationAutoPageSize=True)
-AgGrid(
-    df_filtered,
-    gridOptions=gb.build(),
-    enable_enterprise_modules=False,
-    fit_columns_on_grid_load=True,
-    height=500
-    )
+    AgGrid(
+        df_filtered,
+        gridOptions=gb.build(),
+        enable_enterprise_modules=False,
+        fit_columns_on_grid_load=True,
+        height=500
+        )
 # =========================
 # 2️⃣ 매물 조회
 # =========================
