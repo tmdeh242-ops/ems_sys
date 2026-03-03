@@ -76,7 +76,7 @@ df_total = load_all_data()
 # 🏠 사이드바 메뉴
 # =========================
 with st.sidebar:
-    st.markdown("### 🏢 EMS 관리 센터")
+    st.markdown("### 🏢 EMS 매물등록 관리시스템")
     choice = st.radio("메뉴 이동", ["📊 통합 대시보드", "🔍 등록 매물 조회", "🔐 관리자 모드"])
     st.divider()
     if st.button("🔄 데이터 새로고침", use_container_width=True):
