@@ -19,9 +19,9 @@ if "admin_auth" not in st.session_state:
     st.session_state.admin_auth = False
 
 ADMIN_PASSWORD = "3090"
-EMAIL_SENDER = os.environ.get["EMAIL_ADDRESS"]
-EMAIL_PASSWORD = os.environ.get["EMAIL_PASSWORD"]
-ADMIN_RECEIVER = os.environ.get["ADMIN_NOTIFY_EMAIL"]
+EMAIL_SENDER = os.environ.get("EMAIL_ADDRESS") 
+EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD")
+ADMIN_RECEIVER = os.environ.get("ADMIN_NOTIFY_EMAIL") 
 
 def send_email_notification(subject, body):
     try:
