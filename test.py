@@ -83,13 +83,20 @@ with st.sidebar:
 # 1️⃣ 통합 대시보드 (UI 업그레이드: 지표카드 + 필터)
 # =========================
 if choice == "🏠 통합 대시보드":
-    # 상단 요약 지표 (UI 업그레이드)
+    # 상단 요약 지표 (ZeroDivisionError 방지 로직 추가)
     total_m = len(df_total)
     avail_m = len(df_total[df_total["거래여부"] == "관람가능"])
     
     m1, m2, m3 = st.columns(3)
     m1.metric("📌 전체 관리 매물", f"{total_m}개")
-    m2.metric("✅ 현재 관람 가능", f"{avail_m}개", delta=f"{(avail_m/total_m*100):.1f}%")
+    
+    # 안전한 퍼센트 계산
+    if total_m > 0:
+        percent_val = (avail_m / total_m * 100)
+        m2.metric("✅ 현재 관람 가능", f"{avail_m}개", delta=f"{percent_val:.1f}%")
+    else:
+        m2.metric("✅ 현재 관람 가능", "0개", delta="데이터 없음")
+    
     m3.metric("📅 오늘의 날짜", date.today().strftime("%m/%d"))
 
     st.divider()
