@@ -225,7 +225,7 @@ elif choice == "🔐 관리자 모드":
                     st.dataframe(df_s, use_container_width=True, hide_index=True)
                 else: st.warning(f"{sel_date_s}에 등록된 예약이 없습니다.")
             else:
-                st.info(f"'{v_dj}' 단지에 등록된 예약 데이터가 시트에 아예 없습니다.")
+                st.info(f"'{v_dj}' 단지에 등록된 예약 데이터가 없습니다.")
                 
         except Exception as e:
             st.error(f"⚠️ 데이터를 불러오는 중 오류가 발생했습니다. 구글 시트의 '{v_dj}_관람예약' 탭 이름이 정확한지 확인해 주세요. (에러내용: {e})")
