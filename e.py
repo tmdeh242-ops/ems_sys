@@ -51,7 +51,6 @@ sheet = client.open("EMS")
 @st.cache_data(show_spinner="데이터 동기화 중...", ttl=300)
 def load_all_data():
     sheets = ["1단지_매매","1단지_임대","2단지_매매","2단지_임대","3단지_매매","3단지_임대"]
-    # ✅ [수정] '비고' 컬럼을 리스트 마지막에 추가함
     cols = ["NO.","분양구분","동","호수","타입","매물구분","매매가","월세","거래여부", "비고"]
     df_list = []
     for s in sheets:
@@ -59,7 +58,6 @@ def load_all_data():
             ws = sheet.worksheet(s)
             data = ws.get_all_values()
             if len(data) > 1:
-                # 시트의 실제 데이터 컬럼 수와 정의한 cols 수가 맞는지 확인하며 로드
                 df = pd.DataFrame(data[1:], columns=cols)
                 df["단지"] = s.split("_")[0]
                 df["거래유형"] = s.split("_")[1]
@@ -108,7 +106,7 @@ with st.sidebar:
         st.cache_data.clear()
         st.rerun()
 
-# --- 1번 메뉴: 실시간 매물 현황 ---
+# --- 1번 메뉴 ---
 if choice == "📊 실시간 매물 현황":
     st.title("📊 실시간 매물 현황")
     c1, c2, c3 = st.columns(3)
@@ -116,22 +114,19 @@ if choice == "📊 실시간 매물 현황":
     c2.metric("✅ 완료 매물", f"{len(df_total[df_total['거래여부'] == '거래완료'])}개")
     c3.metric("🏠 관람 가능 매물", f"{len(df_total[df_total['거래여부'] == '관람가능'])}개")
     st.divider()
-    st.subheader("🏆 완료 세대 현황")
     df_done = df_total[df_total["거래여부"] == "거래완료"].copy()
     if not df_done.empty:
-        # ✅ [수정] 완료 현황에도 '비고' 추가
         done_cols = ["분양구분", "동", "타입", "매물구분", "매매가", "월세", "거래여부", "비고"]
         st.dataframe(apply_final_style(df_done, done_cols), use_container_width=True, hide_index=True)
     else: st.info("완료된 매물이 없습니다.")
 
-# --- 2번 메뉴: 등록 매물 조회 ---
+# --- 2번 메뉴 ---
 elif choice == "🔍 등록 매물 조회":
     st.title("🔍 등록 매물 조회")
     f1, f2, f3, f4 = st.columns(4)
     s_danji = f1.multiselect("단지", df_total["단지"].unique())
     s_bunyang = f2.multiselect("분양구분", df_total["분양구분"].unique())
     s_gubun = f3.multiselect("매물구분", df_total["매물구분"].unique())
-    # ✅ '상가'는 시트에 입력만 되어있다면 여기서 자동으로 인식되어 리스트에 뜹니다.
     s_type = f4.multiselect("타입", sorted(df_total["타입"].unique()))
     search_q = st.text_input("동 또는 호수 직접 검색")
     
@@ -142,11 +137,10 @@ elif choice == "🔍 등록 매물 조회":
     if s_type: df_v = df_v[df_v["타입"].isin(s_type)]
     if search_q: df_v = df_v[df_v["동"].str.contains(search_q) | df_v["호수"].str.contains(search_q)]
     
-    # ✅ [수정] 조회 메인 화면에 '비고' 컬럼 노출
     main_cols = ["분양구분", "동", "호수", "타입", "매물구분", "매매가", "월세", "거래여부", "비고"]
     st.dataframe(apply_final_style(df_v, main_cols), use_container_width=True, hide_index=True)
 
-# --- 3번 메뉴: 관리자 모드 ---
+# --- 3번 메뉴 ---
 elif choice == "🔐 관리자 모드":
     if not st.session_state.admin_auth:
         pwd = st.text_input("관리자 인증", type="password")
@@ -176,7 +170,9 @@ elif choice == "🔐 관리자 모드":
                     st.markdown(f"✅ 타입: **{m_row['타입']}** | 상태: **{m_row['거래여부']}**")
                     r_items.append({"동":d_sel, "호수":h_sel, "타입":m_row['타입'], "상태":m_row['거래여부']})
 
-        time_options = [f"{h:02d}:00 ~ {h:02d}:45" for h in range(9, 21) if h != 12]
+        # ✅ [수정] 12:00(점심), 17:00, 20:00 제외 로직 반영
+        time_options = [f"{h:02d}:00 ~ {h:02d}:45" for h in range(9, 21) if h not in [12, 17, 20]]
+        
         with st.form("final_reserve_form"):
             c1, c2 = st.columns(2)
             r_date = c1.date_input("방문 날짜", date.today())
@@ -205,11 +201,9 @@ elif choice == "🔐 관리자 모드":
             if len(v_data) > 1:
                 df_c = pd.DataFrame(v_data[1:], columns=["날짜","예약자","중개업소","세대수","동","호수","타입","시간","동행매니저","비고"])
                 df_c = df_c.fillna("")
-                
                 today_s = date.today().strftime("%Y-%m-%d")
                 st.markdown(f"#### 📅 오늘({today_s}) 스케줄")
                 st.dataframe(df_c[df_c['날짜'] == today_s], use_container_width=True, hide_index=True)
-                
                 st.divider()
                 st.markdown("#### 🔍 날짜별 조회")
                 sel_date = st.date_input("날짜 선택", date.today(), key="sch_dp")
@@ -234,7 +228,6 @@ elif choice == "🔐 관리자 모드":
                     ws = sheet.worksheet(f"{u_dj}_{curr['거래유형']}")
                     for i, r in enumerate(ws.get_all_values()):
                         if len(r) > 3 and r[2] == ud and r[3] == uh:
-                            # ✅ 시트 업데이트 시에도 9번째 열(거래여부)은 그대로 유지되도록 설정
                             ws.update_cell(i+1, 9, new_s)
                             break
                     st.success("완료")
